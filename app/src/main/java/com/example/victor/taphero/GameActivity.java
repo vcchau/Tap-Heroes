@@ -2,19 +2,19 @@ package com.example.victor.taphero;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 public class GameActivity extends AppCompatActivity {
 
+    private SharedPreferences.Editor editor;
     private Button button;
+    private Button finish;
     private TextView time_left;
     private TextView score;
     private int currentScore = 0;
@@ -25,6 +25,21 @@ public class GameActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.game_layout);
+
+        finish = findViewById(R.id.finish);
+        editor = getSharedPreferences("scores", MODE_PRIVATE).edit();
+
+        // Finish the game and crew new Round object
+        finish.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Add score to the scoreboard
+                editor.putInt("previous_score", currentScore);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         score = findViewById(R.id.score);
         time_left = findViewById(R.id.time_left);
@@ -68,12 +83,15 @@ public class GameActivity extends AppCompatActivity {
                         button.setEnabled(false);
                         time_left.setText("Time's up!");
                         score.setText("Final score: " + currentScore);
+                        finish.setVisibility(View.VISIBLE);
                     }
                 }.start();
             }
         }.start();
 
     }
+
+
 
 
     @Override
